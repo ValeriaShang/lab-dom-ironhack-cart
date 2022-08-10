@@ -1,18 +1,14 @@
 // ITERATION 1
 
-function updateSubtotal(product) {
-  let total = 0;
-
-  for (let x = 0; x < product.length; x++) {
-    const price = product[x].querySelector('.price span');
-    const quantity = product[x].querySelector('.quantity input');
-    const subtotal = product[x].querySelector('.subtotal span');
+function updateSubtotal(products) {
+  return Array.from(products).reduce((acc, product) => {
+    const price = product.querySelector('.price span');
+    const quantity = product.querySelector('.quantity input');
+    const subtotal = product.querySelector('.subtotal span');
     const subtotalValue = price.innerText * quantity.value;
     subtotal.textContent = subtotalValue;
-    total += subtotalValue;
-  }
-
-  return total;
+    return acc + subtotalValue;
+  }, 0);
 }
 
 function calculateAll() {
@@ -24,8 +20,7 @@ function calculateAll() {
 
 // ITERATION 4
 
-function removeProduct(event) {
-  const target = event.currentTarget;
+function removeProduct({ target }) {
   target.parentNode.parentNode.remove();
   calculateAll();
 }
@@ -35,28 +30,28 @@ function removeProduct(event) {
 function createProduct() {
   const name = document.getElementById('createName');
   const price = document.getElementById('createPrice');
-  const productsRoot = document.getElementsByClassName('product');
+  const products = document.querySelectorAll('.product');
 
-  productsRoot.insertAdjacentHTML(
-    'beforeend',
-    <tr class="product">
-      <td class="name">
-        <span>Ironhack Rubber Duck</span>
-      </td>
-      <td class="price">
-        $<span>25.00</span>
-      </td>
-      <td class="quantity">
-        <input type="number" value="0" min="0" placeholder="Quantity" />
-      </td>
-      <td class="subtotal">
-        $<span>0</span>
-      </td>
-      <td class="action">
-        <button class="btn btn-remove">Remove</button>
-      </td>
-    </tr>
-  );
+  const product = `
+  <tr class="product">
+    <td class="name">
+    <span>${name.value}</span>
+    </td>
+    <td class="price">
+    $<span>${price.value}</span>
+    </td>
+    <td class="quantity">
+    <input type="number" value="0" min="0" placeholder="Quantity" />
+    </td>
+    <td class="subtotal">
+    $<span>0</span>
+    </td>
+    <td class="action">
+    <button class="btn btn-remove">Remove</button>
+    </td>
+  </tr>
+  `;
+  products[products.length - 1].insertAdjacentHTML('afterend', product);
 }
 
 window.addEventListener('load', () => {
@@ -66,7 +61,8 @@ window.addEventListener('load', () => {
 
   create.addEventListener('click', createProduct);
   calculatePricesBtn.addEventListener('click', calculateAll);
-  for (let x = 0; x < btRemove.length; x++) {
-    btRemove[x].addEventListener('click', removeProduct);
-  }
+  document.querySelector('tbody').addEventListener('click', (e) => {
+    if (e.target.className !== 'btn btn-remove') return;
+    removeProduct(e);
+  });
 });
